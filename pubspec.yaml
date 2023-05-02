@@ -40,7 +40,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_core: ^2.8.0
   firebase_storage: ^11.0.16
-  firebase_auth: ^4.3.0
+  firebase_auth: ^4.2.0
   cloud_firestore: ^4.4.5
   fluttertoast: ^8.2.1
   provider: ^6.0.4
@@ -48,6 +48,18 @@ dependencies:
   image_picker: ^0.8.6
   country_picker: ^2.0.20
   shared_preferences: ^2.0.20
+  flutterfire_ui: ^0.4.3+20
+  text_divider: ^1.0.0
+  cherry_toast: ^1.1.0
+  geolocator: ^9.0.2
+  flutter_typeahead: ^4.3.7
+  location: ^4.4.0
+  location_picker_flutter_map: ^1.2.0
+  firebase_messaging: ^14.4.0
+  uuid: ^3.0.6
+  flutter_rating_bar: ^4.0.1
+  url_launcher: ^6.1.10
+
 
 
 dev_dependencies:

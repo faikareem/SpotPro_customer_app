@@ -23,6 +23,7 @@ class _OtpScreenState extends State<OtpScreen> {
     final isLoading =
         Provider.of<AuthProvider>(context, listen: true).isLoading;
     return Scaffold(
+      resizeToAvoidBottomInset : false,
       body: SafeArea(
         child: isLoading == true
             ? const Center(

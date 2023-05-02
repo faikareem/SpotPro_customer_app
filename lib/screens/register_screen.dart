@@ -35,6 +35,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
     return Scaffold(
+      resizeToAvoidBottomInset : false,
       body: SafeArea(
         child: Center(
           child: Padding(

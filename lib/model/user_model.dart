@@ -5,12 +5,14 @@ class UserModel {
   String phoneNumber;
   String uid;
 
+
   UserModel({
     required this.name,
     required this.email,
     required this.createdAt,
     required this.phoneNumber,
     required this.uid,
+
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -20,7 +22,8 @@ class UserModel {
       uid: map['uid'] ?? '',
       phoneNumber: map['phoneNumber'] ?? '',
       createdAt: map['createdAt'] ?? '',
-    );
+
+     );
   }
 
 
@@ -31,6 +34,7 @@ class UserModel {
       "uid": uid,
       "phoneNumber": phoneNumber,
       "createdAt": createdAt,
+
     };
   }
 }

@@ -26,10 +26,11 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         home: WelcomeScreen(),
         title: "FlutterPhoneAuth",
-        theme: ThemeData(
-          textTheme: GoogleFonts.workSansTextTheme(
+        theme: ThemeData(textTheme: GoogleFonts.workSansTextTheme(
             Theme.of(context).textTheme,
+
           ),
+
         ),
       ),
     );

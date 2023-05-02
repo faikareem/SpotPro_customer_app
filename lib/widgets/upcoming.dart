@@ -1,116 +1,118 @@
+import 'package:cherry_toast/cherry_toast.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+import 'package:spotpro_customer/widgets/review.dart';
+import 'package:text_divider/text_divider.dart';
+import '../provider/firestore_operations.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 
+import '../screens/messaging/goTomessaging.dart';
 
-class ScrollList extends StatelessWidget {
-  const ScrollList({super.key,});
+class ScrollList extends StatefulWidget {
+  const ScrollList({super.key});
+
+  @override
+  State<ScrollList> createState() => _ScrollListState();
+}
+
+class _ScrollListState extends State<ScrollList> {
+  @override
+
+  final SCid = FirebaseAuth.instance.currentUser!.uid;
+  late List<RequestData> bookings;
+
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    GetData();
+  }
 
   @override
   Widget build(BuildContext context){
+
     return Scaffold(
 
       body: SingleChildScrollView(
-        child: Column(
+        child: StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('requests')
+                .orderBy(
+              'timestamp',
+              descending: true,
+            )
+            .where('SCid', isEqualTo: SCid)
+                .snapshots(),
+            builder: (context,snapshot) {
 
-          children: [
-            Image.network('https://i.ibb.co/1ZfVKmf/adf6e07d-b0df-44ca-8dbb-f99f4d627d9e.png'),
-            for (final booking in bookings)
-              BookingListItem(
-                date: booking.date,
-                time: booking.time,
-                place: booking.place,
-                url: booking.url,
-              ),
+              if (snapshot.hasData) {
+                final bookings = snapshot.data!.docs;
 
-          ],
+                return Column(
+                  children: [
+
+                    Stack(
+                      children: [
+                        Container(
+                          height: 200.0,
+                          width: double.infinity, // set the width to the full screen width
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+
+                              colors: [Colors.deepPurple.shade600, Colors.deepPurple.shade200],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            // set rounding at the bottom corners only
+                          ),
+
+                        ),
+                        Positioned(child: Text('Requests', style: TextStyle(fontSize: 28, color: Colors.white, fontWeight: FontWeight.bold),),
+                        top: 160,
+                          left: 10,
+                        )
+                      ],
+                    ),//purple
+
+
+                    for (final booking in bookings)
+                      if(booking['status']=='sent' )
+                        BookingListItem(
+                          date: DateFormat("d MMMM").format(booking['timestamp'].toDate()),
+                          time:"" ,
+                          id: booking.id,
+                          place: booking['locality'],
+                          service: booking['SPid'] ,
+                          description: booking['workDescription']!,
+                          status: booking['status']!,
+                        ),
+                    SizedBox(height: 60,),
+                  ],
+                );
+
+              } else {
+                return Center(
+                  heightFactor: 100,
+                  child: CircularProgressIndicator(),
+                );
+              }
+            }
         ),
       ),
     );
   }
-}
 
-// class BookingListItem extends StatelessWidget {
-//   BookingListItem({ super.key, required this.date,
-//     required this.time,
-//     required this.place,
-//     required this.url,
-//   });
-//
-//   final String date;
-//   final String time;
-//   final String place;
-//   final String url;
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-//       child: AspectRatio(
-//         aspectRatio: 16 / 9,
-//         child: ClipRRect(
-//           borderRadius: BorderRadius.circular(16),
-//           child: Stack(
-//             children: [
-//               Gradient(),
-//               TitleAndSubtitle(),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-//
-//   Widget Gradient() {
-//     return Positioned.fill(
-//       child: DecoratedBox(
-//         decoration: BoxDecoration(
-//           gradient: LinearGradient(
-//             colors: [Colors.white, Colors.lightBlue.shade100],
-//             begin: Alignment.topCenter,
-//             end: Alignment.bottomCenter,
-//             stops: const [0.6, 0.95],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-//
-//
-//   Widget TitleAndSubtitle() {
-//     return Positioned(
-//       left: 20,
-//       bottom: 20,
-//       child: Column(
-//         mainAxisSize: MainAxisSize.min,
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Text(
-//             date,
-//             style: const TextStyle(
-//               color: Colors.white,
-//               fontSize: 30,
-//               fontWeight: FontWeight.bold,
-//             ),
-//           ),
-//           Text(
-//             time,
-//             style: const TextStyle(
-//               color: Colors.white,
-//               fontSize: 24,
-//             ),
-//           ),
-//           Text(
-//             place,
-//             style: const TextStyle(
-//               color: Colors.white,
-//               fontSize: 30,
-//               fontWeight: FontWeight.bold,
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+  Future<String> GetData() async {
+    List<String> ids = await getRequestIdsForSCid(SCid);
+    print(ids);
+    bookings = await getRequestsByIds(ids);
+    return 'done';
+  }
+
+
+
+}
 
 class BookingListItem extends StatelessWidget {
   BookingListItem({
@@ -118,122 +120,188 @@ class BookingListItem extends StatelessWidget {
     required this.date,
     required this.time,
     required this.place,
-    required this.url,
+    required this.service,
+    required this.description,
+    required this.status,
+    required this.id,
+
   }) : super(key: key);
 
   final String date;
   final String time;
   final String place;
-  final String url;
+  final String service;
+  final String description;
+  final String status;
+  final String id;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation:4,
-      surfaceTintColor: Colors.purple,
-      shadowColor: Colors.deepPurple.withOpacity(0.3),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: ClipRRect(
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(16), bottomLeft: Radius.circular(16)),
-              child: Image.network(
-                'https://i.ibb.co/wy8dCq6/7fe5a7bd4d994bdd1eb02b61ef3aae08.webp',
-                fit: BoxFit.fitHeight,
-                scale: 1,
-                opacity: AlwaysStoppedAnimation(0.7),
-                  loadingBuilder: (BuildContext context, Widget child,
-                      ImageChunkEvent? loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                            : null,
-                      ),
-                    );
-                  },
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    place,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w200,
-                    ),
-                  ),
-                  const SizedBox(height: 0),
-                  Divider(),
-                  Text(
-                    date,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[700],
-                    ),
-                  ),
+    var ref = FirebaseFirestore.instance.collection('providers').doc(service);
+    return FutureBuilder<DocumentSnapshot>(
+      future: ref.get(),
+      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          if(!snapshot.data!.exists)return Container();
+          String name = snapshot.data!['name'];
+          return ExpansionTile(
+            collapsedBackgroundColor: (status== 'accepted')?Colors.deepPurple.shade300.withOpacity(0.6): Colors.purple.shade50  ,
+            textColor: Colors.black,
 
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(2))),
+            backgroundColor: (status== 'accepted')?Colors.purpleAccent.shade100.withOpacity(0.4): Colors.deepPurple.shade100,
+            title: Text(name, style: TextStyle(fontWeight: FontWeight.bold),),
+            collapsedShape: ContinuousRectangleBorder(),
+            controlAffinity: ListTileControlAffinity.leading,
+            subtitle: Text(place, style: TextStyle(color: Colors.black54, fontSize: 12),),
+            trailing: SizedBox(
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    status=='accepted'?IconButton(onPressed: (){
+                      createChatroomAndStartConversation(FirebaseAuth.instance.currentUser!.uid, service, context);
 
-                  Divider(),
-                  Text(
-                    time,
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.purple.shade300,
-                    ),
-                  ),
-                ],
+                    },
+                      icon: Icon(Icons.sms_rounded),):SizedBox(),
+                    Text(date, style: TextStyle(fontSize: 14),),
+                  ]
               ),
+              width: 150,
+
             ),
-          ),
-        ],
-      ),
+            children: <Widget>[
+
+              ListTile(
+                title: Align(
+                    alignment: Alignment.topLeft, child: (status == 'sent')?Text('Waiting For Response'):Text('Accepted')),
+                subtitle: Align(
+                    alignment: Alignment.bottomLeft, child: Text(description)),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    MaterialButton(
+                        child: Icon(Icons.delete_forever_outlined, color: Colors.purple.shade300, size: 30,),
+                        onPressed: (){
+
+                          Widget cancelButton = ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.resolveWith((states) {
+                                // If the button is pressed, return green, otherwise blue
+                                if (states.contains(MaterialState.pressed)) {
+                                  return Colors.deepPurple.shade200;
+                                }
+                                return Colors.purple;
+                              }),
+                            ),
+                            child: const Text(
+                              "No",
+                              style: TextStyle(
+
+                                fontSize: 16.0,
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context, rootNavigator: true).pop(); // close the dialog
+                            },
+                          );
+
+                          Widget deleteButton = ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.resolveWith((states) {
+                                // If the button is pressed, return green, otherwise blue
+                                if (states.contains(MaterialState.pressed)) {
+                                  return Colors.purple.shade200;
+                                }
+                                return Colors.purple;
+                              }),
+                            ),
+                            child: const Text(
+                              "Yes",
+                              style: TextStyle(
+
+                                fontWeight: FontWeight.bold,
+
+                              ),
+                            ),
+                            onPressed: () {
+                              cancelRequest(id);
+                              CherryToast.info(title: Text('Request Deleted'));
+                              Navigator.of(context, rootNavigator: true).pop();
+                              // close the dialog
+                            },
+                          );
+
+                          // set up the AlertDialog
+                          AlertDialog alert = AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            title: Text(
+                              "Are you sure?",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                            content: Text(
+                              "Deleting this request cannot be undone.",
+                              style: TextStyle(
+                                fontSize: 16.0,
+                              ),
+                            ),
+                            actions: [
+                              cancelButton,
+                              deleteButton,
+                            ],
+                          );
+
+                          // show the dialog
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return alert;
+                            },
+                          );
+                        }
+
+                    ),
+                    (status == 'accepted')? MaterialButton(
+                        child: Icon(Icons.reviews, color: Colors.purple.shade300, size: 30,),
+                        onPressed: (){
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text('Write a Review'),
+                              content: ReviewForm(SPid: service,),
+                            ),
+                          );
+
+                        }
+
+                    ) : SizedBox(),
+                  ],
+                ),
+
+              ),
+            ],
+          );
+        } else {
+          return Center(
+            child: CircularProgressIndicator(
+              color: Colors.deepPurple.shade400,
+            )
+            ,
+            widthFactor:2,
+            heightFactor: 2,
+          );
+        }
+      },
     );
+
   }
 }
 
 
-class booking {
-  const booking({
-    required this.date,
-    required this.time,
-    required this.place,
-    required this.url,
-  });
 
-  final String date;
-  final String time;
-  final String place;
-  final String url;
-
-}
-  const bookings= [
-    booking(
-      date: '29-03-2022', time: '1:00 pm', place: 'Kunnamangalam',
-      url: 'URL',
-    ),
-    booking(
-      date: '31-03-2022', time: '1:00 pm', place: 'Kunnamangalam',
-      url: 'URL',
-    ),
-    booking(
-      date: '01-04-2022', time: '1:00 pm', place: 'Kunnamangalam',
-      url: 'URL',
-    ),
-  ];
 

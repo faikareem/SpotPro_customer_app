@@ -1,60 +1,60 @@
 import 'package:flutter/material.dart';
+import '../provider/firestore_operations.dart';
+import 'searchresults.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class Catcard extends StatelessWidget {
   const Catcard({
 
     this.name = 'Cat Name',
+    this.url = 'Cat url',
   });
 
   final String name;
+  final String url;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        //border: Border.all(color: Color(0xffeeeeee), width: 2.0),
-        color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(14.0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            
 
-            blurRadius: 5,
-            spreadRadius: 0.2,
-            offset: Offset(0, 6),
-          ),
-        ],
+
+    return ElevatedButton(
+
+      onPressed: () {
+
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+            builder: (context) => ResultsList(category: name)
+        ));
+      },
+      style: ElevatedButton.styleFrom(
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10), // make it square shaped
+        ),
+        minimumSize: Size(90, 90),
+        maximumSize: Size(90, 90),
+        backgroundColor: Color.fromRGBO(255, 255, 255, 50)// set size to 90px x 90px
       ),
-      margin: EdgeInsets.all(8),
-      height: 90,
-      width: 90,
-      child: Column(
 
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Center(
-              child: SizedBox(
-                child: Image.network('https://i.ibb.co/68Hv5Py/air-conditioner.png',
-                  fit: BoxFit.fitWidth,
-                  opacity: const AlwaysStoppedAnimation(.5),
-                ),
-                height: 50,
-                width: 50,
-              )
+          SizedBox(height: 1),
+          Image.network(
+            url,
+            height: 40,
+            width: 40,
+            color: Colors.black45,
           ),
-          SizedBox(
-            height: 8.0,
-          ),
+          // add some space between image and text
           Text(
             name,
-            style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 10.0,
-                color: Colors.grey),
+            style: TextStyle(fontSize: 10, color: Colors.black45),
           ),
+          SizedBox(height: 1,)
         ],
       ),
-      
     );
+
   }
 }

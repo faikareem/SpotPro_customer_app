@@ -166,6 +166,7 @@ class _UserInfromationScreenState extends State<UserInfromationScreen> {
       createdAt: "",
       phoneNumber: "",
       uid: "",
+
     );
 
       ap.saveUserDataToFirebase(
