@@ -4,7 +4,9 @@ A new Flutter project.
 
 ## DESCRIPTION
 
-As part of this project, we developed two distinct apps to establish a seamless connection between local service providers and potential customers. The consumer app offers a range of useful features, including geolocation functionality, one-touch phone calling, in-app messaging, and a review system, facilitating an improved user experience. On the other hand, the partner app is dedicated solely to service providers, allowing them to register and create profiles, which an admin then approves. By facilitating the ability to select specific services, browse through a comprehensive list of providers, and easily request services through a messaging system, the app addresses the challenge of efficiently locating service providers for consumers and resolving the issue of consistent employment opportunities for service providers. This project contributes to the service industry, connecting consumers and providers alike and promoting ease and convenience.
+As part of this project, we developed two distinct apps to establish a seamless connection between local service providers and potential customers. The consumer app offers a range of useful features, including geolocation functionality, one-touch phone calling, in-app messaging, and a review system, facilitating an improved user experience. On the other hand, the partner app is dedicated solely to service providers, allowing them to register and create profiles, which an admin then approves.
+
+By facilitating the ability to select specific services, browse through a comprehensive list of providers, and easily request services through a messaging system, the app addresses the challenge of efficiently locating service providers for consumers and resolving the issue of consistent employment opportunities for service providers. This project contributes to the service industry, connecting consumers and providers alike and promoting ease and convenience.
 
 ## USER INTERFACE
 <img src="https://github.com/krishn210/Spotpro_Customer/assets/79520747/dc4dd9b3-b814-415a-9a3b-f791ddf96409" alt="Home Screen" width="250">
